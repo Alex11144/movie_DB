@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:the_movie_db/counter_mvvm/counter.dart';
+import 'package:the_movie_db/second_screen/provider_example.dart';
+import 'package:the_movie_db/third_screen/third_screen.dart';
 import 'package:the_movie_db/widgets/movie_list/movie_list_widget.dart';
 
 class MainScreenWidget extends StatefulWidget {
-  MainScreenWidget({
+  const MainScreenWidget({
     Key? key,
   }) : super(key: key);
 
@@ -12,7 +15,7 @@ class MainScreenWidget extends StatefulWidget {
 
 class _MainScreenWidgetState extends State<MainScreenWidget> {
   int initialIndex = 0;
-  final screens = [const Text('News'), const MovieListWiget(), const Text('Series')];
+  final screens = [const CounterWidget(),const  MovieListWidget(), ThirdScren()];
   void SelectedTab(int index) {
     if (initialIndex == index) return;
     setState(() {

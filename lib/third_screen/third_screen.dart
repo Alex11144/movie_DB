@@ -1,43 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/src/foundation/key.dart';
+import 'package:flutter/src/widgets/framework.dart';
+import 'package:provider/provider.dart';
 import 'package:the_movie_db/Theme/app_colors.dart';
 import 'package:the_movie_db/src/api/movies_api.dart';
+import 'package:the_movie_db/widgets/movie_list/movie_list_widget.dart';
 
-bool hide = false;
-
-class Movie {
-  final int id;
-  final String imageName;
-  final String title;
-  final String time;
-  final String description;
-
-  Movie(
-      {required this.id,
-      required this.imageName,
-      required this.title,
-      required this.time,
-      required this.description});
-}
-
-class MovieListWidget extends StatefulWidget {
-  const MovieListWidget({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  State<MovieListWidget> createState() => _MovieListWidgetState();
-}
-
-class _MovieListWidgetState extends State<MovieListWidget> {
-  @override
-  Color color = Colors.black;
-
+class Model1 extends ChangeNotifier {
+  bool _hide = false;
+  bool get hide1 => _hide;
   ScrollController _controller = ScrollController();
   final TextEditingController _searchController = TextEditingController();
   var _filteredMovies = <Movie>[];
 
   void _searchMovies() {
     final query = _searchController.text;
+
     if (query.isNotEmpty) {
       _filteredMovies = movies.where((Movie movie) {
         return movie.title.toLowerCase().contains(query.toLowerCase());
@@ -45,27 +23,54 @@ class _MovieListWidgetState extends State<MovieListWidget> {
     } else {
       _filteredMovies = movies;
     }
-    setState(() {});
+    notifyListeners();
   }
 
-  void _onMovieTap(int index) {
+  void _searchHider() {
+    if (_hide == true) {
+      _hide = false;
+    } else if (_hide == false) {
+      _hide = true;
+    }
+    notifyListeners();
+  }
+
+  void _onMovieTap(int index, context) {
     final id = movies[index];
 
     Navigator.of(context).pushNamed('/main_screen/movie_details',
         arguments: {'movies_info': id});
   }
 
-  void initState() {
+  Model1() {
     _controller.addListener(() {
-      setState(() {
-        hide = false;
-      });
+      _hide = false;
+      notifyListeners();
     });
-    super.initState();
     _filteredMovies = movies;
 
     _searchController.addListener(_searchMovies);
+    notifyListeners();
   }
+  // void initState() {
+  //   _controller.addListener(() {
+  //     hide = false;
+  //     notifyListeners();
+  //   });
+  //   _filteredMovies = movies;
+
+  //   _searchController.addListener(_searchMovies);
+  //   notifyListeners();
+  // }
+
+  // progress() {
+  //   initState();
+  // }
+}
+
+class ThirdScren extends StatelessWidget {
+   ThirdScren({Key? key}) : super(key: key);
+  Color color = Colors.black;
 
   @override
   Widget build(BuildContext context) {
@@ -82,15 +87,7 @@ class _MovieListWidgetState extends State<MovieListWidget> {
                   // height: 30,
                   // width: 84,
                   child: TextButton(
-                      onPressed: () {
-                        setState(() {
-                          if (hide == true) {
-                            hide = false;
-                          } else if (hide == false) {
-                            hide = true;
-                          }
-                        });
-                      },
+                      onPressed: () => context.read<Model1>()._searchHider(),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -113,11 +110,12 @@ class _MovieListWidgetState extends State<MovieListWidget> {
                   child: Stack(
                     children: [
                       ListView.builder(
-                        controller: _controller,
+                        controller: context.watch<Model1>()._controller,
                         padding: const EdgeInsets.only(top: 10),
                         keyboardDismissBehavior:
                             ScrollViewKeyboardDismissBehavior.onDrag,
-                        itemCount: _filteredMovies.length,
+                        itemCount:
+                            context.watch<Model1>()._filteredMovies.length,
                         itemExtent: 163,
                         itemBuilder: ((context, index) {
                           final movie = movies[index];
@@ -188,7 +186,9 @@ class _MovieListWidgetState extends State<MovieListWidget> {
                                 color: Colors.transparent,
                                 child: InkWell(
                                   borderRadius: BorderRadius.circular(10),
-                                  onTap: () => _onMovieTap(index),
+                                  onTap: () => context
+                                      .read<Model1>()
+                                      ._onMovieTap(index, context),
                                 ),
                               )
                             ]),
@@ -197,17 +197,17 @@ class _MovieListWidgetState extends State<MovieListWidget> {
                       ),
                       // hide == true
                       //     ?
-                      if (hide == true)
+                      if (context.read<Model1>()._hide == true)
                         Padding(
                             padding: const EdgeInsets.all(10.0),
                             child: TextField(
-                                controller: _searchController,
+                                controller:
+                                    context.read<Model1>()._searchController,
                                 decoration: InputDecoration(
                                     labelText: 'Search',
                                     filled: true,
                                     fillColor: Colors.white.withAlpha(235),
                                     border: const OutlineInputBorder())))
-           
                     ],
                   ),
                 ),
@@ -215,65 +215,3 @@ class _MovieListWidgetState extends State<MovieListWidget> {
             )));
   }
 }
-
-// Center(
-//         child: Container(
-//             color: Colors.white,
-//             width: 390,
-//             height: 840,
-//             child: Scaffold(
-//               backgroundColor: AppColors.mainDarkBlue,
-//               body: FutureBuilder<List<Users>>(
-//                   future: usersFuture,
-//                   builder: (context, snapshot) {
-//                     if (snapshot.hasData) {
-//                       final users = snapshot.data!;
-//                       return buildUsers(users);
-//                     } else {
-//                       return Text("error");
-//                     }
-//                   }),
-//             )));
-//   }
-// }
-
-// Widget buildUsers(List<Users> users) => ListView.builder(
-//       itemCount: 30,
-//       itemExtent: 163,
-//       itemBuilder: ((context, index) {
-//         final user = users[index];
-//         return Card(
-//           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-//           elevation: 30,
-//           child: Container(
-//             margin: EdgeInsets.symmetric(vertical: 5),
-//             color: Colors.white,
-//             child: Padding(
-//               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-//               child: Column(
-//                 children: [
-//                   Text(
-//                     user.body,
-//                     style: TextStyle(fontSize: 10),
-//                   ),
-//                   Divider(
-//                     thickness: 10,
-//                   ),
-//                   Text(user.title, style: TextStyle(fontSize: 10)),
-//                   Text(user.id.toString())
-//                 ],
-//               ),
-//             ),
-//           ),
-//         );
-//       }),
-//     );
-
-// Future<List<Users>> usersFuture = fetchNotes();
-
-// static Future<List<Users>> fetchNotes() async {
-//   var url = 'https://jsonplaceholder.typicode.com/posts';
-//   final response = await http.get(Uri.parse(url));
-//   final body = json.decode(response.body);
-//   return body.map<Users>(Users.fromJson).toList();
-// }

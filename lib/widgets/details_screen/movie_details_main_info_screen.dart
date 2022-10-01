@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:the_movie_db/elements/radial_percent_widget.dart';
+import 'package:the_movie_db/widgets/details_screen/movie_details_main_screencast_widget.dart';
+import 'package:the_movie_db/widgets/movie_list/movie_list_widget.dart';
 
 class MovieDetailsMainInfoWidget extends StatelessWidget {
   const MovieDetailsMainInfoWidget({Key? key}) : super(key: key);
@@ -10,8 +12,8 @@ class MovieDetailsMainInfoWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const _TopPosterImages(),
-        const Padding(
-          padding: EdgeInsets.all(10.0),
+        Padding(
+          padding: const EdgeInsets.all(10.0),
           child: _MovieNameWidget(),
         ),
         const _ScoreWidget(),
@@ -27,7 +29,7 @@ class MovieDetailsMainInfoWidget extends StatelessWidget {
         const SizedBox(
           height: 20,
         ),
-        _ActorsWidget()
+        _ActorsWidget(),
       ],
     );
   }
@@ -61,8 +63,10 @@ class _TopPosterImages extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      children: [
-        const Image(
+      // fit: StackFit.expand,
+      children: const [
+        Image(
+          // width: double.infinity,
           image: AssetImage('assets/images/tomClancy1.jpeg'),
         ),
         Positioned(
@@ -70,6 +74,7 @@ class _TopPosterImages extends StatelessWidget {
             left: 10,
             bottom: 20,
             child: Image(
+                // height: 500,
                 width: 90,
                 image: AssetImage('assets/images/tomClancyWall.jpg'))),
       ],
@@ -78,22 +83,19 @@ class _TopPosterImages extends StatelessWidget {
 }
 
 class _MovieNameWidget extends StatelessWidget {
-  const _MovieNameWidget({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
-    final title = ModalRoute.of(context)!.settings.arguments as Map;
-    final rootTitle = title['details_info'];
+    final Map moviesInfo = ModalRoute.of(context)!.settings.arguments as Map;
     return RichText(
       textAlign: TextAlign.center,
       maxLines: 3,
       text: TextSpan(
         children: [
           TextSpan(
-              text: rootTitle.title,
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
-          TextSpan(
-            text: ' (2021)',
+              text: moviesInfo['movies_info'].title,
+              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+          const TextSpan(
+            text: '  (2021)',
             style: TextStyle(
                 fontSize: 16, fontWeight: FontWeight.w400, color: Colors.grey),
           )
@@ -120,14 +122,14 @@ class _ScoreWidget extends StatelessWidget {
                   height: 40,
                   child: RadialPercentWidget(
                     percent: 0.72,
-                    fillColor: Color.fromARGB(255, 10, 23, 25),
-                    lineColor: Color.fromARGB(255, 37, 203, 103),
-                    freeColor: Color.fromARGB(255, 25, 54, 31),
+                    fillColor: const Color.fromARGB(255, 10, 23, 25),
+                    lineColor: const Color.fromARGB(255, 37, 203, 103),
+                    freeColor: const Color.fromARGB(255, 25, 54, 31),
                     lineWidth: 3,
-                    child: Text('72'),
+                    child: const Text('72'),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 5,
                 ),
                 const Text("User Score", style: TextStyle(color: Colors.white)),
@@ -141,12 +143,12 @@ class _ScoreWidget extends StatelessWidget {
         TextButton(
             onPressed: () {},
             child: Row(
-              children: [
-                const Icon(
+              children: const [
+                Icon(
                   Icons.play_arrow,
                   color: Colors.white,
                 ),
-                const Text(
+                Text(
                   "Play Trailer",
                   style: TextStyle(color: Colors.white),
                 ),
@@ -192,7 +194,7 @@ class _ActorsWidget extends StatelessWidget {
     fontWeight: FontWeight.w400,
     color: Colors.white,
   );
-  _ActorsWidget({Key? key}) : super(key: key);
+  const _ActorsWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
